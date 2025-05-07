@@ -1,0 +1,10 @@
+# aliases for zsh
+
+alias one="cd 'C:/Users/ivojo/OneDrive/'"
+alias e="exit"
+alias int="start msedge"
+alias copy-to-clipboard="python 'C:/Users/ivojo/OneDrive/HOME/tools/copy-to-clipboard.py'"
+alias gpt-copy="python 'C:/Users/ivojo/OneDrive/HOME/tools/gpt-copy.py'"
+alias insiders="code-insiders"
+alias code="code-insiders"
+

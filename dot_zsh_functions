@@ -1,0 +1,136 @@
+# functions for zsh
+# cdf requires fd, fzf, bat & viu
+
+function cdf() {
+  local results target dir scope cache_file=~/.cdf_cache default_scope="C:/Users/ivojo/OneDrive/" use_cache=1 search_term
+
+  # Standardmäßiges Suchverzeichnis ist dein OneDrive
+  scope="${default_scope}"
+
+  # Verarbeite alle Argumente flexibel
+  while [[ "$1" ]]; do
+    case "$1" in
+      --clear-cache)
+        rm -f "$cache_file"
+        echo "Cache cleared."
+        return 0
+        ;;
+      --no-cache)
+        use_cache=0
+        ;;
+      --local)
+        scope="."
+        ;;
+      --global)
+        scope="/"
+        ;;
+      *)
+        search_term="$1"
+        ;;
+    esac
+    shift
+  done
+
+  # Überprüfen, ob ein Suchmuster definiert wurde
+  if [[ -z "$search_term" ]]; then
+    echo "Please provide a file or directory name to search for."
+    return 1
+  fi
+
+  # Prüfen, ob Treffer im Cache existieren, falls Cache aktiviert ist
+  if [[ $use_cache -eq 1 && -f "$cache_file" ]]; then
+    target=$(grep -m 1 "$search_term" "$cache_file")
+  fi
+
+  # Wenn kein Treffer im Cache gefunden wurde oder Cache deaktiviert ist, fuzzy Suche mit fd
+  if [[ -z "$target" ]]; then
+    results=$(fd --type f --type d "$search_term" "$scope" 2>/dev/null)
+
+    # Prüfen, ob Ergebnisse gefunden wurden
+    if [[ -z "$results" ]]; then
+      echo "File or directory not found in $scope"
+      return 1
+    fi
+
+    # Treffer in den Cache schreiben, falls Cache aktiviert ist
+    if [[ $use_cache -eq 1 ]]; then
+      echo "$results" >> "$cache_file"
+    fi
+  else
+    results="$target"
+  fi
+
+  # Fuzzy-Suche mit fzf bei Mehrfachtreffern, inklusive Vorschau
+  if [[ $(echo "$results" | wc -l) -gt 1 ]]; then
+    target=$(echo "$results" | fzf \
+      --prompt="Select a file, directory, or image: " \
+      --height=85% \
+      --layout=reverse \
+      --preview="[[ -f {} && {} =~ \.(png|jpg|jpeg|gif)$ ]] && viu {} || ([[ -f {} ]] && bat --style=numbers --color=always {} || ls -la {})" \
+      --preview-window=down:65%)
+    if [[ -z "$target" ]]; then
+      echo "No selection made"
+      return 1
+    fi
+  else
+    # Nur ein Treffer
+    target="$results"
+  fi
+
+  # Handhabung für Dateien oder Verzeichnisse
+  if [[ -d "$target" ]]; then
+    cd "$target" || echo "Could not change directory to $target"
+  elif [[ -f "$target" ]]; then
+    dir=$(dirname "$target")
+    cd "$dir" || echo "Could not change directory to $dir"
+  else
+    echo "Unexpected target type"
+    return 1
+  fi
+}
+
+
+function collect-and-copy() {
+#!/usr/bin/env zsh
+
+# Parameter 1: Die gesuchte Dateiendung, z.B. ".java"
+PATTERN="$1"
+
+# Überprüfen, ob ein Parameter übergeben wurde
+if [ -z "$PATTERN" ]; then
+  echo "Usage: $0 <file-extension>"
+  echo "Example: $0 .java"
+  exit 1
+fi
+
+# Alle Dateien finden, die auf das Pattern enden
+FILELIST=$(find . -type f -name "*$PATTERN" 2>/dev/null)
+
+# Falls keine Dateien gefunden wurden, meldung und beenden
+if [ -z "$FILELIST" ]; then
+  echo "No files found for pattern '$PATTERN'."
+  exit 0
+fi
+
+# Hier sammeln wir den kompletten Output
+OUTPUT=""
+
+for file in $FILELIST; do
+  # Füge einen Header mit Dateiname hinzu, plus Leerzeile
+  OUTPUT="${OUTPUT}
+===== ${file} =====
+
+$(cat "$file")
+
+"
+done
+
+# Jetzt landet alles ins Clipboard
+# Echte Zeilenumbrüche sind bereits im $OUTPUT enthalten
+echo "$OUTPUT" | clip.exe
+
+echo "Copied to clipboard. Found these files:"
+echo "$FILELIST"
+
+}
+
