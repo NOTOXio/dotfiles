@@ -1,0 +1,37 @@
+#!/bin/bash
+
+flatpak_update() {
+  if ! command -v flatpak &>/dev/null; then
+    echo "Skipping flatpak update"
+    return 0
+  fi
+
+  flatpak update
+}
+
+pacman_update() {
+  if ! command -v pacman &>/dev/null; then
+    echo "Skipping pacman update"
+    return 0
+  fi
+
+  sudo pacman -Syu
+}
+
+aur_update() {
+  if ! command -v yay &>/dev/null; then
+    echo "Skipping aur update"
+    return 0
+  fi
+
+  yay -Syu
+}
+
+main() {
+  echo "Starting update"
+  pacman_update
+  aur_update
+  flatpak_update
+}
+
+main "$@"

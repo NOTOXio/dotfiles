@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Check if system is using iwd
+if ! systemctl is-active iwd  &> /dev/null; then
+  echo "Warning: Your system is not using iwd for wireless network connections!"
+  exit 1
+fi
+
+if [ "$(id -u)" -ne 0 ]; then
+  exec sudo -- "$0" "$@"
+fi
+
+config_file="/var/lib/iwd/eduroam.8021x"
+
+# Handle eduroam already configured
+if [[ -f "$config_file" ]]; then
+  echo "Warning: $config_file already exist."
+  if gum confirm "Do you want to replace it?"; then
+    rm "$config_file"
+  else
+    exit 0
+  fi
+fi
+
+domain="$(gum input --placeholder="Enter the domain of your university (e.g dhbw-loerrach.de)")"
+username="$(gum input --placeholder="Enter your username")"
+password="$(gum input --password --placeholder="Enter your password")"
+
+if [[ -z "$domain" || -z "$username" || -z "$password" ]]; then
+  echo "Warning: You have to fill out all fields!"
+  exit 1
+fi
+
+read -r -d '' prompt << EOF
+Domain: $domain
+Username: $username
+Password: $(printf '%*s' "${#password}" '' | tr ' ' '*')
+
+Is this correct?
+EOF
+
+if ! gum confirm "$prompt"; then
+  exit 0
+fi
+
+cat > "$config_file" << EOF
+[Security]
+EAP-Method=PEAP
+EAP-Identity=@$domain
+EAP-PEAP-Phase2-Method=MSCHAPV2
+EAP-PEAP-Phase2-Identity=$username@$domain
+EAP-PEAP-Phase2-Password=$password
+
+[Settings]
+AutoConnect=true
+EOF

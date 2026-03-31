@@ -1,0 +1,4 @@
+font-family = GeistMono NF
+theme = TokyoNight Moon
+
+shell-integration-features = ssh-env

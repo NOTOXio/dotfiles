@@ -1,0 +1,37 @@
+# Print contents of $PATH line by line
+paths() {
+  echo "$PATH" | tr ':' '\n'
+}
+
+# Search in files recursively
+rgrep() {
+  grep -Id recurse "$@"
+}
+
+# Create and enter a folder
+mkd() {
+  mkdir -p -- "$1" && cd -- "$1"
+}
+
+# Launch neovide independently
+nvide() {
+  systemd-run --user --no-block --working-directory="$PWD" neovide "$@" &>/dev/null 
+}
+
+# Dispaly current load
+load() {
+  local one five fifteen procs lastpid cores
+  read one five fifteen procs lastpid < /proc/loadavg
+  cores="$(nproc)"
+
+  cat <<EOF
+Load:
+  1min:       $one/$cores
+  5min:       $five/$cores
+  15min:      $fifteen/$cores
+
+Processes:
+  Running:    $procs
+  Last PID:   $lastpid
+EOF
+}

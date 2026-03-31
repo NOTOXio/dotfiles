@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
+source "$(dirname "$SCRIPT_DIR")/utils.bash"
+
+GSHELL="org.gnome.shell.keybindings"
+WM="org.gnome.desktop.wm.keybindings"
+MEDIA="org.gnome.settings-daemon.plugins.media-keys"
+MOD="<Super>"
+PKGS=(
+  gnome-shell-extension-appindicator
+)
+
+gsettings_set() {
+  local space="$1"
+  local action="$2"
+  local binding="$3"
+
+  gsettings set "$space" "$action" "['$binding']"
+}
+
+set_keyboard_layout() {
+  gsettings set org.gnome.desktop.input-sources show-all-sources true
+  gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'de+neo_qwertz')]"
+}
+
+set_keybindings() {
+  # Windows
+  gsettings_set "$WM" close "${MOD}q"
+  gsettings_set "$WM" toggle-fullscreen "${MOD}f"
+
+  gsettings set "$GSHELL" toggle-message-tray "[]"
+  gsettings_set "$WM" toggle-maximized "${MOD}m"
+
+  # Navigation
+  gsettings_set "$WM" cycle-windows "${MOD}k"
+
+  # Launchers
+  gsettings_set "$MEDIA" home "${MOD}e"
+  gsettings_set "$MEDIA" www "${MOD}b"
+}
+
+reset_keybindings() {
+  gsettings reset-recursively "$GSHELL"
+  gsettings reset-recursively "$WM"
+  gsettings reset-recursively "$MEDIA"
+}
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    exit 1
+  fi
+
+  case "$1" in
+  --setup)
+    pacman_install "${PKGS[@]}"
+    set_keybindings
+    ;;
+  --reset)
+    reset_keybindings
+    ;;
+  *)
+    exit 1
+    ;;
+  esac
+
+  set_keyboard_layout
+}
+
+main "$@"

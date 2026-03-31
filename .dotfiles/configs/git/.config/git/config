@@ -1,0 +1,13 @@
+[alias]
+  co = checkout
+  br = branch
+  ci = commit
+  st = status
+  sw = switch
+[pull]
+  rebase = true
+[init]
+  defaultBranch = main
+[user]
+  name = Jonathan Fritsch
+  email = jon.fri14@gmail.com

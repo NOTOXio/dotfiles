@@ -1,0 +1,7 @@
+BITWARDEN_SSH_SOCK="$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
+if [[ -e "$BITWARDEN_SSH_SOCK" ]]; then
+	export SSH_AUTH_SOCK="$BITWARDEN_SSH_SOCK"
+fi
+unset BITWARDEN_SSH_SOCK
+
+export PATH="/home/sealjonny/.local/bin:$PATH"

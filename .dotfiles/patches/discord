@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if ! command -v discord &>/dev/null; then
+  exit 1
+fi
+
+if ! command -v jq &>/dev/null; then
+  exit 1
+fi
+
+settings_file="$HOME/.config/discord/settings.json"
+
+if [[ -f "$settings_file" ]]; then
+  jq '.SKIP_HOST_UPDATE = true' "$settings_file" >tmp.json && mv tmp.json "$settings_file"
+fi

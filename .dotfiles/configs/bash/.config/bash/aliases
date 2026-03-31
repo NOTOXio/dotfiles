@@ -1,0 +1,15 @@
+# Shorten common apps
+alias v="nvim"
+alias g="git"
+alias d="docker"
+alias c="bat"
+
+# Replace ls with eza
+alias ls="eza --group-directories-first --color=auto"
+
+# Clipboard
+alias copy="wl-copy"
+alias paste="wl-paste"
+
+# Print external ip
+alias externalip="curl -sS https://www.daveeddy.com/ip"

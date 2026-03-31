@@ -1,0 +1,28 @@
+[Unit]
+Description=Mount Nextcloud via rclone (user)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+# Make sure the mountpoint exists
+ExecStartPre=/usr/bin/mkdir -p %h/Nextcloud
+# Bail out early if Nextcloud is unreachable
+ExecStartPre=/bin/sh -c 'rclone lsd Nextcloud: --contimeout=5s --timeout=5s --retries=1 || exit 1'
+# Start rclone mount
+ExecStart=/usr/bin/rclone mount Nextcloud: %h/Nextcloud \
+  --vfs-cache-mode=writes \
+  --dir-cache-time=72h \
+  --contimeout=5s \
+  --timeout=30s \
+  --retries=1 \
+  --low-level-retries=1
+# Clean unmount on stop/restart
+ExecStop=/usr/bin/fusermount -uz %h/Nextcloud
+Restart=on-failure
+RestartSec=30
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target

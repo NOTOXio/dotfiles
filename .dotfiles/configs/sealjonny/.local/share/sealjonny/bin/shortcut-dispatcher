@@ -1,0 +1,11 @@
+#!/bin/bash
+
+shortcut="$1"
+shortcut_fullname="$(hyprctl globalshortcuts | grep -E "$shortcut" | awk '{ print $1 }')" 
+
+if [[ -z "$shortcut_fullname" ]]; then
+  notify-send "Shortcut not found" "Could not find a shortcut matching $shortcut"
+  exit 1
+fi
+
+hyprctl dispatch global "$shortcut_fullname"
