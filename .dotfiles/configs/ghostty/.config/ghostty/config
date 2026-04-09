@@ -1,4 +1,6 @@
 font-family = GeistMono NF
-theme = TokyoNight Moon
+theme = Catppuccin Mocha
+
+background-opacity = 0.93
 
 shell-integration-features = ssh-env

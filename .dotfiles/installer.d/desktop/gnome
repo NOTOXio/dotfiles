@@ -20,9 +20,34 @@ gsettings_set() {
   gsettings set "$space" "$action" "['$binding']"
 }
 
-set_keyboard_layout() {
-  gsettings set org.gnome.desktop.input-sources show-all-sources true
-  gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'de+neo_qwertz')]"
+add_custom_keybinding() {
+  local name="$1"
+  local command="$2"
+  local binding="$3"
+  local id="$4"
+
+  local base="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/$id/"
+  local current
+  local new
+
+  current=$(gsettings get "$MEDIA" custom-keybindings)
+
+  if [[ "$current" == "@as []" ]]; then
+    new="['$base']"
+  elif [[ "$current" != *"$base"* ]]; then
+    new="${current%]}"
+    new="${new}, '$base']"
+  else
+    new="$current"
+  fi
+
+  if [[ "$new" != "$current" ]]; then
+    gsettings set "$MEDIA" custom-keybindings "$new"
+  fi
+
+  gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$base" name "$name"
+  gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$base" command "$command"
+  gsettings set "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$base" binding "$binding"
 }
 
 set_keybindings() {
@@ -39,6 +64,24 @@ set_keybindings() {
   # Launchers
   gsettings_set "$MEDIA" home "${MOD}e"
   gsettings_set "$MEDIA" www "${MOD}b"
+
+  # Workspace switching
+  gsettings_set "$WM" switch-to-workspace-1 "${MOD}1"
+  gsettings_set "$WM" switch-to-workspace-2 "${MOD}2"
+  gsettings_set "$WM" switch-to-workspace-3 "${MOD}3"
+
+  # Move current window to workspace
+  gsettings_set "$WM" move-to-workspace-1 "${MOD}<Shift>1"
+  gsettings_set "$WM" move-to-workspace-2 "${MOD}<Shift>2"
+  gsettings_set "$WM" move-to-workspace-3 "${MOD}<Shift>3"
+
+  # Disable default GNOME app switching on Super+1..3
+  gsettings set "$GSHELL" switch-to-application-1 "[]"
+  gsettings set "$GSHELL" switch-to-application-2 "[]"
+  gsettings set "$GSHELL" switch-to-application-3 "[]"
+
+  # Launch Ghostty
+  add_custom_keybinding "Ghostty" "ghostty" "${MOD}Return" "ghostty"
 }
 
 reset_keybindings() {
@@ -64,8 +107,6 @@ main() {
     exit 1
     ;;
   esac
-
-  set_keyboard_layout
 }
 
 main "$@"

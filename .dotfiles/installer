@@ -18,7 +18,6 @@ STOW_PKGS=(
 )
 
 declare -A GIT_REPOS=(
-  ["SealJonny/nvim.git"]="$HOME/.config/nvim"
 )
 
 install_pkgs() {

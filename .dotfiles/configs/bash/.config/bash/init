@@ -5,3 +5,8 @@ fi
 if command -v fzf &> /dev/null; then
   eval "$(fzf --bash)"
 fi
+
+if command -v uv &> /dev/null; then
+  eval "$(uv generate-shell-completion bash)"
+  eval "$(uvx --generate-shell-completion bash)
+fi
