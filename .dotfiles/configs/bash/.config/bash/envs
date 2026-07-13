@@ -4,4 +4,4 @@ if [[ -e "$BITWARDEN_SSH_SOCK" ]]; then
 fi
 unset BITWARDEN_SSH_SOCK
 
-export PATH="/home/sealjonny/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
