@@ -82,6 +82,10 @@ set_keybindings() {
 
   # Launch Ghostty
   add_custom_keybinding "Ghostty" "ghostty" "${MOD}Return" "ghostty"
+
+  # Launch Obsidian (free Super+O from default rotation lock)
+  gsettings_set "$MEDIA" rotate-video-lock-static "XF86RotationLockToggle"
+  add_custom_keybinding "Obsidian" "obsidian" "${MOD}o" "obsidian"
 }
 
 reset_keybindings() {
