@@ -13,7 +13,6 @@ STOW_PKGS=(
   ghostty
   git
   starship
-  systemd
   bin
   ssh
 )
@@ -138,6 +137,11 @@ main() {
     stow_setup
   fi
   stow_install "${STOW_PKGS[@]}"
+
+  # Wiki (Obsidian-Vault) liegt im Nextcloud-Ordner; der Link existiert schon vor dem ersten Sync
+  if [[ ! -e "$HOME/Wiki" && ! -L "$HOME/Wiki" ]]; then
+    ln -s "$HOME/Nextcloud/notox/Wiki" "$HOME/Wiki"
+  fi
 
   # Setup desktop via custom script
   case "${XDG_CURRENT_DESKTOP:-}" in

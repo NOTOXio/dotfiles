@@ -11,3 +11,5 @@ fd
 ripgrep
 rclone
 uv
+sops
+age
