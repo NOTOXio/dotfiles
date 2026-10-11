@@ -15,9 +15,11 @@ STOW_PKGS=(
   starship
   systemd
   bin
+  ssh
 )
 
 declare -A GIT_REPOS=(
+  ["NOTOXio/homelab"]="$HOME/dev/homelab"
 )
 
 install_pkgs() {
@@ -127,6 +129,9 @@ main() {
   fi
 
   mkdir -p "$HOME/.config/systemd/user/"
+  # ~/.ssh muss ein echtes Verzeichnis sein, sonst verlinkt stow den ganzen Ordner ins Repo
+  # (und neue private Schlüssel landeten dort)
+  mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   mkdir -p "$HOME/.local/bin/"
 
   if [[ ! -f "$STOWRC" ]]; then
