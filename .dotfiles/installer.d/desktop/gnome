@@ -86,6 +86,9 @@ set_keybindings() {
   # Launch Obsidian (free Super+O from default rotation lock)
   gsettings_set "$MEDIA" rotate-video-lock-static "XF86RotationLockToggle"
   add_custom_keybinding "Obsidian" "obsidian" "${MOD}o" "obsidian"
+
+  # Screenshot UI (keep Print, add Super+Shift+S)
+  gsettings set "$GSHELL" show-screenshot-ui "['Print', '${MOD}<Shift>s']"
 }
 
 reset_keybindings() {
