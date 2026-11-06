@@ -1,3 +1,8 @@
+# Editor for git, sudoedit etc. and theme for bat (also used in fzf previews)
+export EDITOR="micro"
+export VISUAL="micro"
+export BAT_THEME="Catppuccin Mocha"
+
 BITWARDEN_SSH_SOCK="$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
 if [[ -e "$BITWARDEN_SSH_SOCK" ]]; then
 	export SSH_AUTH_SOCK="$BITWARDEN_SSH_SOCK"

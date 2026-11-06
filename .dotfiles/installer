@@ -15,6 +15,7 @@ STOW_PKGS=(
   starship
   bin
   ssh
+  fd
 )
 
 declare -A GIT_REPOS=(

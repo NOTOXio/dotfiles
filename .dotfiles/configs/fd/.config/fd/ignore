@@ -1,0 +1,24 @@
+# Folders fd (and therefore fzf ctrl-t / alt-c) skips everywhere.
+# Patterns work like .gitignore and match at any depth.
+
+# Caches and package stores
+.cache/
+.npm/
+.gradle/
+.cargo/
+.rustup/
+node_modules/
+__pycache__/
+.venv/
+.codex/.tmp/
+go/pkg/
+
+# Big SDKs and app data
+Android/Sdk/
+Unity/Hub/
+.local/share/Steam/
+.local/share/Trash/
+.var/app/*/cache/
+
+# Unity project build output
+Library/

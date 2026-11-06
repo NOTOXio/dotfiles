@@ -1,0 +1,99 @@
+# fzf settings, based on Jonny's config. Key bindings come from `fzf --bash` in init.
+command -v fzf &>/dev/null || return 0
+
+# Defaults for every fzf call, colors match the Catppuccin Mocha terminal theme.
+# bg:-1 keeps the terminal background (and its transparency).
+export FZF_DEFAULT_OPTS="
+  --height=40% --layout=reverse --border --info=inline-right
+  --bind='ctrl-/:toggle-preview'
+  --bind='ctrl-y:execute-silent(echo -n {+} | wl-copy)+abort'
+  --color=bg+:#313244,bg:-1,gutter:-1,border:#6c7086,label:#cdd6f4
+  --color=fg:#cdd6f4,fg+:#cdd6f4,hl:#f38ba8,hl+:#f38ba8
+  --color=header:#f38ba8,info:#cba6f7,prompt:#cba6f7,spinner:#f5e0dc
+  --color=pointer:#f5e0dc,marker:#b4befe,selected-bg:#45475a
+  --color=separator:#6c7086,scrollbar:#6c7086"
+
+# fd for file search (ignored folders are in ~/.config/fd/ignore), previews with bat/eza
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons=always --color=always {}'"
+
+# History: ctrl-y copies the command, shift-delete removes it from history
+export FZF_CTRL_R_OPTS="
+  --bind='ctrl-y:execute-silent(echo -n {2..} | wl-copy)+abort'
+  --header='ctrl-y: copy, shift-del: delete, ctrl-r: toggle sort'"
+
+# Use fd for **<Tab> completion
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude .git . "$1"
+}
+
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude .git . "$1"
+}
+
+# Command specific previews for **<Tab> completion
+_fzf_comprun() {
+  local command="$1"
+  shift
+
+  case "$command" in
+  cd) fzf --preview 'eza --tree --level=2 --icons=always --color=always {}' "$@" ;;
+  export | unset) fzf --preview "eval 'echo \${}'" "$@" ;;
+  kill | ssh | telnet) fzf "$@" ;;
+  *) fzf --preview 'if [[ -d {} ]]; then eza --tree --level=2 --icons=always --color=always {}; else bat --color=always --style=numbers --line-range=:500 {}; fi 2>/dev/null' "$@" ;;
+  esac
+}
+
+# Live grep with ripgrep: enter opens the match in micro, ctrl-o in VS Code
+rgf() {
+  local rg_cmd="rg --hidden --glob=!.git/ --column --line-number --no-heading --color=always --smart-case"
+  fzf --ansi --disabled --query "${1:-}" --height=80% \
+    --bind "start:reload:[ -n {q} ] && $rg_cmd {q} || true" \
+    --bind "change:reload:sleep 0.1; [ -n {q} ] && $rg_cmd {q} || true" \
+    --delimiter : \
+    --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+    --preview-window 'right:60%,+{2}+3/3' \
+    --header 'enter: micro, ctrl-o: vs code' \
+    --bind 'enter:become(micro {1} +{2}:{3})' \
+    --bind 'ctrl-o:become(code --goto {1}:{2}:{3})'
+}
+
+# Full-text search in the wiki: enter opens the note in micro, ctrl-o in Obsidian
+wikif() {
+  local rg_cmd="rg --column --line-number --no-heading --color=always --smart-case --type md"
+  (
+    cd "$HOME/Wiki" || exit
+    fzf --ansi --disabled --query "${1:-}" --height=80% --prompt 'wiki> ' \
+      --bind "start:reload:[ -n {q} ] && $rg_cmd {q} || true" \
+      --bind "change:reload:sleep 0.1; [ -n {q} ] && $rg_cmd {q} || true" \
+      --delimiter : \
+      --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+      --preview-window 'right:60%,+{2}+3/3' \
+      --header 'enter: micro, ctrl-o: obsidian' \
+      --bind 'enter:become(micro {1} +{2}:{3})' \
+      --bind 'ctrl-o:execute-silent(xdg-open "obsidian://open?path=$(jq -rn --arg p "$HOME/Wiki/"{1} "\$p | @uri")")+abort'
+  )
+}
+
+# Search repo and aur packages and install the selection
+pkgi() {
+  local -a pkgs
+  mapfile -t pkgs < <(yay -Slq | fzf --multi --query "${1:-}" --height=80% \
+    --preview 'yay -Si {1}' --preview-window 'right:60%:wrap' \
+    --header 'tab: select multiple')
+
+  ((${#pkgs[@]} > 0)) && yay -S "${pkgs[@]}"
+}
+
+# Pick explicitly installed packages and remove them (with unused dependencies)
+pkgr() {
+  local -a pkgs
+  mapfile -t pkgs < <(yay -Qeq | fzf --multi --query "${1:-}" --height=80% \
+    --preview 'yay -Qi {1}' --preview-window 'right:60%:wrap' \
+    --header 'tab: select multiple')
+
+  ((${#pkgs[@]} > 0)) && yay -Rns "${pkgs[@]}"
+}

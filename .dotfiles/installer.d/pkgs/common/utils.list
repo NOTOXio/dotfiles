@@ -7,6 +7,9 @@ wl-clipboard
 stow
 jq
 fzf
+bat
+eza
+zoxide
 fd
 ripgrep
 rclone
