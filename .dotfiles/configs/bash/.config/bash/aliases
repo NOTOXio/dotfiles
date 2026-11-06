@@ -1,5 +1,5 @@
 # Shorten common apps
-alias v="nvim"
+alias e="micro"
 alias g="git"
 alias d="docker"
 alias c="bat"

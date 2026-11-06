@@ -13,11 +13,6 @@ mkd() {
   mkdir -p -- "$1" && cd -- "$1"
 }
 
-# Launch neovide independently
-nvide() {
-  systemd-run --user --no-block --working-directory="$PWD" neovide "$@" &>/dev/null 
-}
-
 # Dispaly current load
 load() {
   local one five fifteen procs lastpid cores
