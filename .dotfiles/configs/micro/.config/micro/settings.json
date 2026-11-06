@@ -1,0 +1,38 @@
+{
+    "colorscheme": "catppuccin-mocha",
+    "keymenu": true,
+    "mouse": true,
+    "savecursor": true,
+    "saveundo": true,
+    "diffgutter": true,
+    "scrollbar": true,
+    "hlsearch": true,
+    "matchbracestyle": "highlight",
+    "mkparents": true,
+    "autosu": true,
+    "rmtrailingws": true,
+    "tabstospaces": true,
+    "tabsize": 4,
+    "ft:markdown": {
+        "softwrap": true,
+        "wordwrap": true,
+        "tabsize": 2
+    },
+    "ft:yaml": {
+        "tabsize": 2
+    },
+    "ft:json": {
+        "tabsize": 2
+    },
+    "ft:makefile": {
+        "tabstospaces": false
+    },
+    "ft:go": {
+        "tabstospaces": false
+    },
+    "ft:git-commit": {
+        "colorcolumn": 72,
+        "softwrap": true,
+        "wordwrap": true
+    }
+}

@@ -16,6 +16,7 @@ STOW_PKGS=(
   bin
   ssh
   fd
+  micro
 )
 
 declare -A GIT_REPOS=(
@@ -133,6 +134,8 @@ main() {
   # (und neue private Schlüssel landeten dort)
   mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   mkdir -p "$HOME/.local/bin/"
+  # micro schreibt Laufzeitdaten (buffers/, backups/, plug/) in seinen Config-Ordner, der darf kein Link ins Repo sein
+  mkdir -p "$HOME/.config/micro/plug"
 
   if [[ ! -f "$STOWRC" ]]; then
     stow_setup

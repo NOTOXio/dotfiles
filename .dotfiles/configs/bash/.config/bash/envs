@@ -3,6 +3,10 @@ export EDITOR="micro"
 export VISUAL="micro"
 export BAT_THEME="Catppuccin Mocha"
 
+# Colored man pages through bat
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANROFFOPT="-c"
+
 BITWARDEN_SSH_SOCK="$HOME/.var/app/com.bitwarden.desktop/data/.bitwarden-ssh-agent.sock"
 if [[ -e "$BITWARDEN_SSH_SOCK" ]]; then
 	export SSH_AUTH_SOCK="$BITWARDEN_SSH_SOCK"

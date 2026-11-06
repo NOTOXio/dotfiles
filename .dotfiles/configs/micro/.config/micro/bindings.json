@@ -1,0 +1,4 @@
+{
+    "CtrlP": "command:fzf",
+    "Alt-z": "command:toggle softwrap"
+}
